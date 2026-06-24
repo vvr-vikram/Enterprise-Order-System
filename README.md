@@ -50,12 +50,10 @@ When a client sends a `POST /orders` request:
 
 ### Steps to Run
 1. Open Eclipse.
-2. Select **File** -> **Import...** -> **Existing Maven Projects**.
-3. Select the `enterprise-order-app` directory and click **Finish**.
-4. In the Package Explorer, navigate to `src/main/java/com/enterprise/order/EnterpriseOrderApplication.java`.
-5. Right-click the file and select **Run As** -> **Java Application**.
-6. The application will start on port `8080`.
-7. The database schema `enterprise_order_db` and tables will be created automatically, and mock data will be seeded.
+2. In the Package Explorer, navigate to `src/main/java/com/enterprise/order/EnterpriseOrderApplication.java`.
+3. Right-click the file and select **Run As** -> **Java Application**.
+4. The application will start on port `8080`.
+5. The database schema `enterprise_order_db` and tables will be created automatically, and mock data will be seeded.
 
 ---
 
