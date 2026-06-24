@@ -1,0 +1,154 @@
+{
+	"info": {
+		"_postman_id": "c62fb529-873b-48ae-94a2-7fa34522a101",
+		"name": "Enterprise Order Application",
+		"description": "API collection for verifying consolidated endpoint routing, client idempotency, and transactional ACID updates.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Fetch User Info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/user-123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"user-123"
+					]
+				},
+				"description": "Fetches user details from the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order (Happy Path)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Idempotency-Key",
+						"value": "unique-idempotency-key-uuid-101",
+						"type": "text",
+						"description": "Unique key to ensure idempotency across requests"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": \"user-123\",\n    \"total\": 150.00,\n    \"productId\": \"prod-101\",\n    \"quantity\": 2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders"
+					]
+				},
+				"description": "Submits a new order to the system. Succeeds since product prod-101 has 50 units in stock and amount is within payment limits."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order (Out of Stock Rollback)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Idempotency-Key",
+						"value": "unique-idempotency-key-uuid-102",
+						"type": "text",
+						"description": "Unique key to ensure idempotency across requests"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": \"user-123\",\n    \"total\": 150.00,\n    \"productId\": \"prod-101\",\n    \"quantity\": 100\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders"
+					]
+				},
+				"description": "Fails since product prod-101 only has 50 units in stock. The transaction rolls back completely; no order or payment is saved in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Order Status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/orders/replace-with-order-id",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders",
+						"replace-with-order-id"
+					]
+				},
+				"description": "Retrieves the status of an existing order by its UUID."
+			},
+			"response": []
+		},
+		{
+			"name": "Process Payment (Direct)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"orderId\": \"some-order-uuid-here\",\n    \"amount\": 250.50,\n    \"productId\": \"prod-101\",\n    \"quantity\": 2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/payments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"payments"
+					]
+				},
+				"description": "Directly submits a payment processing request."
+			},
+			"response": []
+		}
+	]
+}
